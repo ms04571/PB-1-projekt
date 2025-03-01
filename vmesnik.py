@@ -4,17 +4,26 @@ import sqlite3 as dbapi
 BAZA = 'serije.db'
 
 
-GLAVNI_MENI = ["Išči", "Kategorije", "Dobre serije", "Zapri"]
+GLAVNI_MENI = ["Išči", "Žanri", "Dobre serije", "Zapri"]
 ISCI_NE_OBSTAJA = ["Ponovno išči", "Glavni meni"]
+PREGLED_EPIZOD = ["Najboljše epizode", "Najboljša sezona"]
+ZACETEK = ["Glavni meni"]
+ZANRI = ['Musical', 'Documentary', 'News', 'Talk-Show',
+         'Family', 'Game-Show', 'Comedy', 'Music', 'Drama', 'Crime',
+         'Mystery', 'Fantasy', 'Reality-TV', 'History', 'Sport', 'Action',
+         'Adventure', 'Western', 'Horror', 'Sci-Fi', 'Romance', 'War',
+         'Animation', 'Thriller', 'Biography', 'Short', 'Adult'] 
 
 
-
-
-def galavniMeni():
+def glavniMeni():
     izbira = menu(GLAVNI_MENI)
     match izbira:
         case 1:
             isci()
+        case 2:
+            izberiZanr() #TODO
+        case 3:
+            najboljsi() #TODO
         case 4:
             return
 
@@ -45,7 +54,7 @@ def isci():
             case 1:
                 isci()
             case 2:
-                galavniMeni()
+                glavniMeni()
     else:
         izpisiRezultat(izhod)
 
@@ -92,9 +101,19 @@ def izberi(id):
     print(vrstica)
     if vrstica[1] == "tvSeries":
         izpisiSerijo(vrstica)
-        
+        izbira = menu(PREGLED_EPIZOD)
+        match izbira:
+            case 1:
+                najboljseEpizode() #TODO
+            case 2:
+                najboljšaSezona() #TODO
+
     else:
         izpisiEpizodo(vrstica)
+        izbira = menu(ZACETEK)
+        match izbira:
+            case 1:
+                glavniMeni() #TODO
 
     
 
@@ -138,6 +157,7 @@ def zanri(id):
 
     return z
 
+
 def vsotaCas(id):
     izhod = conn.execute(
         """
@@ -147,7 +167,8 @@ def vsotaCas(id):
             WHERE n1.id = ?;
         """, [id]
     )
-    return izhod.fetchone()[0]# or "\\N"
+    return izhod.fetchone()[0]
+
 
 def stSezonInEpizod(id):
     sezone = conn.execute(
@@ -233,7 +254,7 @@ try:
 
 
         
-        galavniMeni()
+        glavniMeni()
 
 
 finally:
