@@ -15,4 +15,4 @@ ocena: id serije ali epizode, povprečje, število glasov
 osebe: id, id serije ali epizode, kategorija zaposlitve, karakterji
 
 
-![ERdiagram](https://github.com/user-attachments/assets/9214e5b5-f5d6-4175-be74-01bbe75d4d99)
+![ERdiagram](https://github.com/user-attachments/assets/97fb5ab2-836e-4925-86ff-a977c659687d)
