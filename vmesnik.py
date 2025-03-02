@@ -6,7 +6,7 @@ BAZA = 'serije.db'
 
 GLAVNI_MENI = ["Išči", "Žanri", "Top 10", "Zapri"]
 ISCI_NE_OBSTAJA = ["Ponovno išči", "Glavni meni"]
-PREGLED_EPIZOD = ["Najboljše epizode", "Najboljša sezona"]
+PREGLED_EPIZOD = ["Najboljše epizode", "Vse epizode"]
 ZACETEK = ["Glavni meni"]
 ZANRI = ['Musical', 'Documentary', 'News', 'Talk-Show',
          'Family', 'Game-Show', 'Comedy', 'Music', 'Drama', 'Crime',
@@ -81,11 +81,14 @@ def menu(moznosti):
 
 def izpisiRezultat(rez):
     dolzina = len(rez)
+    if dolzina == 0:
+        print("Nič pametnega")
+        return glavniMeni()
     while True:
         for i in range(min(dolzina, 10)):
             print(str(i + 1) + ")", end = " ")
-            for e in rez[i]:
-                print(e, end = " ")
+            for e in rez[i][1:]:
+                print(e, end = "   ")
             print()
 
         vhod = input()
@@ -98,16 +101,14 @@ def izpisiRezultat(rez):
 
 def izberi(id):
     vrstica = conn.execute("SELECT * FROM naslovi WHERE id = ?;", [id]).fetchone()
-    print(vrstica)
     if vrstica[1] == "tvSeries":
         izpisiSerijo(vrstica)
         izbira = menu(PREGLED_EPIZOD)
         match izbira:
             case 1:
-                najboljseEpizode(id) #TODO
+                najboljseEpizode(id)
             case 2:
-                najboljšaSezona(id) #TODO
-
+                pregledEpzod(id)
     else:
         izpisiEpizodo(vrstica)
         izbira = menu(ZACETEK)
@@ -206,9 +207,7 @@ def izpisiEpizodo(vrstica):
             sezona/epizoda : {sezona} / {epizoda}
             ocena/število volilcev : {ocena} / {stVolitev}
             spletna stran : {url}
-            žanri : 
-        """, end = "")
-    print(tabZanri)
+            žanri : """, end = "")
     for zanr in tabZanri:
         print(zanr + " ", end = "")
     print()
@@ -221,7 +220,6 @@ def sezonaInEpizoda(id):
             SELECT sezona, epizoda FROM epizode
             WHERE id = ?;
         """,[id]).fetchall()
-    print(izhod)
     sezona = izhod[0][0]
     epizoda = izhod[0][1]
     return (sezona, epizoda)
@@ -234,11 +232,10 @@ def izberiZanr():
     while True:
         print(f"stran: {stran} od 3")
         for i in range((stran - 1) * 9, stran * 9):
-            print(str(i + 1) + ")" + ZANRI[i])
-        
-        izbira = input("Premik strani: '<' ali '>'")
+            print(str((i + 1) - (stran - 1) * 9) + ")" + ZANRI[i])
+        izbira = input("Premik strani: '<' ali '>'  ")
         if izbira in ("1", "2", "3", "4", "5", "6", "7", "8", "9"):
-            isciZanr(ZANRI[int(izbira) * stran])
+            return isciZanr(ZANRI[int(izbira) - 1 + (stran - 1) * 9])
         elif izbira == "<":
             stran = max(1, stran - 1)
         elif izbira == ">":
@@ -250,7 +247,7 @@ def izberiZanr():
 def isciZanr(izbranZanr):
     izhod = conn.execute(
         """
-            SELECT naslov, ocena FROM naslovi
+            SELECT naslovi.id, naslov, ocena FROM naslovi
             JOIN zanr ON zanr.id = naslovi.id
             JOIN ocene ON ocene.id = naslovi.id
             WHERE zanr.zanr = ? AND stVolitev > 10000 AND naslovi.tip = "tvSeries"
@@ -265,10 +262,10 @@ def isciZanr(izbranZanr):
 def top10():
     izhod = conn.execute(
         """
-            SELECT naslov, ocena FROM naslovi
+            SELECT naslovi.id, naslov, ocena FROM naslovi
             JOIN zanr ON zanr.id = naslovi.id
             JOIN ocene ON ocene.id = naslovi.id
-            WHERE zanr.zanr = ? AND stVolitev > 100000 AND naslovi.tip = "tvSeries"
+            WHERE stVolitev > 100000 AND naslovi.tip = "tvSeries"
             GROUP BY naslov
             ORDER BY ocene.ocena DESC
             LIMIT 10;
@@ -279,7 +276,47 @@ def top10():
 
 
 def najboljseEpizode(id):
-    # TODO
+    izhod = conn.execute(
+        """
+            SELECT n2.id, n2.naslov, ocene.ocena, sezona, epizoda FROM naslovi n1
+            JOIN epizode ON epizode.serija = n1.id
+            JOIN naslovi n2 ON epizode.id = n2.id
+            JOIN ocene ON ocene.id = n2.id
+            WHERE n1.id = ?
+            ORDER BY ocene.ocena DESC
+            LIMIT 10;
+        """,[id]).fetchall()
+    izpisiRezultat(izhod)
+
+
+def pregledEpzod(id):
+    izhod = conn.execute(
+        """
+            SELECT n2.id, n2.naslov, ocene.ocena, epizoda, sezona FROM naslovi n1
+            JOIN epizode ON epizode.serija = n1.id
+            JOIN naslovi n2 ON epizode.id = n2.id
+            JOIN ocene ON ocene.id = n2.id
+            WHERE n1.id = ?
+            ORDER BY sezona, epizoda;
+        """,[id]).fetchall()
+    
+    stran = 1
+    while True:
+        print(f"stran: {stran} od {len(izhod) // 9 + 1}")
+        for i in range((stran - 1) * 9, min(stran * 9, len(izhod))):
+            print(str((i + 1) - (stran - 1) * 9) + ")", end = "")
+            for e in izhod[i][1:]:
+                print(str(e), end = "    ")
+            print()
+        izbira = input("Premik strani: '<' ali '>'  ")
+        if izbira in ("1", "2", "3", "4", "5", "6", "7", "8", "9"):
+            return izberi(izhod[int(izbira) - 1 + (stran - 1) * 9][0])
+        elif izbira == "<":
+            stran = max(1, stran - 1)
+        elif izbira == ">":
+            stran = min(3, stran + 1)
+        else:
+            print("Napačen vhod \n")
 
 
 try:
