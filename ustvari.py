@@ -56,12 +56,6 @@ try:
             """
         )
 
-#    cur.execute(
-#        """
-#            CREATE TABLE IF NOT EXISTS 
-#        """
-#    )
-
 
 
 
@@ -224,10 +218,11 @@ def uvozOcene():
 
 
 
+
 #brisi("epizode")
 #brisi("zanr")
 #brisi("ocene")
-
+#brisi("naslovi")
 
 #uvozEpizode()
 #uvozNaslovi()
