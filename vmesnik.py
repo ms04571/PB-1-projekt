@@ -4,7 +4,7 @@ import sqlite3 as dbapi
 BAZA = 'serije.db'
 
 
-GLAVNI_MENI = ["Išči", "Žanri", "Dobre serije", "Zapri"]
+GLAVNI_MENI = ["Išči", "Žanri", "Top 10", "Zapri"]
 ISCI_NE_OBSTAJA = ["Ponovno išči", "Glavni meni"]
 PREGLED_EPIZOD = ["Najboljše epizode", "Najboljša sezona"]
 ZACETEK = ["Glavni meni"]
@@ -21,9 +21,9 @@ def glavniMeni():
         case 1:
             isci()
         case 2:
-            izberiZanr() #TODO
+            izberiZanr()
         case 3:
-            najboljsi() #TODO
+            top10()
         case 4:
             return
 
@@ -41,7 +41,7 @@ def isci():
         """
             SELECT naslovi.id, naslov, ocena FROM naslovi
             JOIN ocene ON naslovi.id = ocene.id
-            WHERE naslov LIKE ? AND tip = "tvSeries"
+            WHERE naslov LIKE ? AND tip = "tvSeries" AND stVolitev > 10000
             ORDER BY ocena DESC
             LIMIT 10;
         """,["%" + vhod + "%"]
@@ -104,9 +104,9 @@ def izberi(id):
         izbira = menu(PREGLED_EPIZOD)
         match izbira:
             case 1:
-                najboljseEpizode() #TODO
+                najboljseEpizode(id) #TODO
             case 2:
-                najboljšaSezona() #TODO
+                najboljšaSezona(id) #TODO
 
     else:
         izpisiEpizodo(vrstica)
@@ -116,12 +116,6 @@ def izberi(id):
                 glavniMeni() #TODO
 
     
-
-
-
-
-
-
 def izpisiSerijo(vrstica):
     id, _, naslov, zacetekLeto, konecLeto, __ = vrstica
     tabZanri = zanri(id)
@@ -235,13 +229,57 @@ def sezonaInEpizoda(id):
 
 
 
+def izberiZanr():
+    stran = 1
+    while True:
+        print(f"stran: {stran} od 3")
+        for i in range((stran - 1) * 9, stran * 9):
+            print(str(i + 1) + ")" + ZANRI[i])
+        
+        izbira = input("Premik strani: '<' ali '>'")
+        if izbira in ("1", "2", "3", "4", "5", "6", "7", "8", "9"):
+            isciZanr(ZANRI[int(izbira) * stran])
+        elif izbira == "<":
+            stran = max(1, stran - 1)
+        elif izbira == ">":
+            stran = min(3, stran + 1)
+        else:
+            print("Napačen vhod \n")
+
+
+def isciZanr(izbranZanr):
+    izhod = conn.execute(
+        """
+            SELECT naslov, ocena FROM naslovi
+            JOIN zanr ON zanr.id = naslovi.id
+            JOIN ocene ON ocene.id = naslovi.id
+            WHERE zanr.zanr = ? AND stVolitev > 10000 AND naslovi.tip = "tvSeries"
+            GROUP BY naslov
+            ORDER BY ocene.ocena DESC
+            LIMIT 10;
+        """, [izbranZanr]).fetchall()
+    izpisiRezultat(izhod)
+
+
+
+def top10():
+    izhod = conn.execute(
+        """
+            SELECT naslov, ocena FROM naslovi
+            JOIN zanr ON zanr.id = naslovi.id
+            JOIN ocene ON ocene.id = naslovi.id
+            WHERE zanr.zanr = ? AND stVolitev > 100000 AND naslovi.tip = "tvSeries"
+            GROUP BY naslov
+            ORDER BY ocene.ocena DESC
+            LIMIT 10;
+        """).fetchall()
+    izpisiRezultat(izhod)
 
 
 
 
-
-
-
+def najboljseEpizode(id):
+    # TODO
 
 
 try:
