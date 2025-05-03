@@ -1,7 +1,8 @@
-import sqlite3 as dbapi
+import sqlite3 as dbapi3
+import os
 
-
-BAZA = 'serije.db'
+path = os.path.dirname(os.path.realpath(__file__))
+BAZA = path + "\\" + 'serije.db'
 
 
 GLAVNI_MENI = ["Išči", "Žanri", "Top 10", "Zapri"]
