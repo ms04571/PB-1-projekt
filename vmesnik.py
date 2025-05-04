@@ -1,4 +1,4 @@
-import sqlite3 as dbapi3
+import sqlite3 as dbapi
 import os
 
 path = os.path.dirname(os.path.realpath(__file__))
@@ -71,12 +71,16 @@ def menu(moznosti):
     while True:
         for i in range(len(moznosti)):
             print(str(i + 1) + ")" + moznosti[i])
+        print()
 
         vhod = input()
+        
         if (len(vhod) > 0) and (vhod.isdigit()) and (int(vhod) in range(1, len(moznosti) + 1)):
             return int(vhod)
         else:
             print("Napačen vhod \n")
+        print()
+        
     
 
 
@@ -84,6 +88,7 @@ def izpisiRezultat(rez):
     dolzina = len(rez)
     if dolzina == 0:
         print("Nič pametnega")
+        print()
         return glavniMeni()
     while True:
         for i in range(min(dolzina, 10)):
@@ -91,13 +96,15 @@ def izpisiRezultat(rez):
             for e in rez[i][1:]:
                 print(e, end = "   ")
             print()
-
+        print()
         vhod = input()
+        
         if (len(vhod) > 0) and (vhod.isdigit()) and (int(vhod) in range(1, dolzina + 1)):
             izberi(rez[int(vhod) - 1][0])
             return
         else:
             print("Napačen vhod \n")
+        
     
 
 def izberi(id):
@@ -115,7 +122,7 @@ def izberi(id):
         izbira = menu(ZACETEK)
         match izbira:
             case 1:
-                glavniMeni() #TODO
+                glavniMeni()
 
     
 def izpisiSerijo(vrstica):
@@ -173,7 +180,7 @@ def stSezonInEpizod(id):
             WHERE serija = ?;
         """, [id])
     epizode = conn.execute(
-        """
+        """32
             SELECT COUNT(epizoda) FROM epizode
             WHERE serija = ?;
         """, [id])
@@ -243,6 +250,7 @@ def izberiZanr():
             stran = min(3, stran + 1)
         else:
             print("Napačen vhod \n")
+        print()
 
 
 def isciZanr(izbranZanr):
@@ -302,8 +310,9 @@ def pregledEpzod(id):
         """,[id]).fetchall()
     
     stran = 1
+    maxStrani = len(izhod) // 9 + 1
     while True:
-        print(f"stran: {stran} od {len(izhod) // 9 + 1}")
+        print(f"stran: {stran} od {maxStrani}")
         for i in range((stran - 1) * 9, min(stran * 9, len(izhod))):
             print(str((i + 1) - (stran - 1) * 9) + ")", end = "")
             for e in izhod[i][1:]:
@@ -315,9 +324,10 @@ def pregledEpzod(id):
         elif izbira == "<":
             stran = max(1, stran - 1)
         elif izbira == ">":
-            stran = min(3, stran + 1)
+            stran = min(maxStrani, stran + 1)
         else:
             print("Napačen vhod \n")
+        print()
 
 
 try:
