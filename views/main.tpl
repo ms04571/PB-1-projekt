@@ -11,27 +11,38 @@
             <legend>Filtri</legend>
 
             Razvrsti po: <select name="sortirajPo">
-                <option value="naslov">Naslov</option>
-                <option value="zacetekLeto">Leto</option>
-                <option value="ocena">Ocena</option>
-                <option value="stVolitev">Število volitev</option>
-            </select>
+                <option value="naslov" {{'selected' if parametri.get('sortirajPo') == 'naslov' else ''}}>Naslov</option>
+                <option value="zacetekLeto" {{'selected' if parametri.get('sortirajPo') == 'zacetekLeto' else ''}}>Leto</option>
+                <option value="ocena" {{'selected' if parametri.get('sortirajPo') == 'ocena' else ''}}>Ocena</option>
+                <option value="stVolitev" {{'selected' if parametri.get('sortirajPo') == 'stVolitev' else ''}}>Število volitev</option>
+            </select><br><br>
             Način razvrščanja: <select name="sortiranje">
-                <option value="ASC">Naraščajoče</option>
-                <option value="DESC">Padajoče</option>
-            </select>
-            Naslov: <input type="text" name="naslov" value="{{params.get('naslov', '')}}"><br><br>
-            Žanr: <input type="text" name="zanr" value="{{params.get('zanr', '')}}"><br><br>
+                <option value="ASC" {{'selected' if parametri.get('sortiranje') == 'ASC' else ''}}>Naraščajoče</option>
+                <option value="DESC" {{'selected' if parametri.get('sortiranje') == 'DESC' else ''}}>Padajoče</option>
+            </select><br><br>
+            Naslov: <input type="text" name="naslov" value="{{parametri.get('naslov', '')}}"><br><br>
+            <details>
+                <summary>Žanri (izberi do 3)</summary>
+                <div id="zanriOkno">
+                    % for zanr in zanri:
+                        <label>
+                            <input type="checkbox" name="zanr" value="{{zanr}}" 
+                                {{'checked' if zanr in izbraniZanri else ''}}>
+                            {{zanr}}
+                        </label><br>
+                    % end
+                </div>
+            </details><br>
             Leto (Min - Max): 
-            <input type="number" name="letoMin" value="{{params.get('letoMin', '')}}" style="width: 80px;">
+            <input type="number" name="letoMin" value="{{parametri.get('letoMin', '')}}" style="width: 80px;">
             -
-            <input type="number" name="letoMax" value="{{params.get('letoMax', '')}}" style="width: 80px;"><br><br>
+            <input type="number" name="letoMax" value="{{parametri.get('letoMax', '')}}" style="width: 80px;"><br><br>
             Ocena (Min - Max): 
-            <input type="range" name="ocenaMin" min="0" max="10" step="0.1" value="{{params.get('ocenaMin', 0)}}"> 
+            <input type="range" name="ocenaMin" min="0" max="10" step="0.1" value="{{parametri.get('ocenaMin', 0)}}"> 
             do 
-            <input type="range" name="ocenaMax" min="0" max="10" step="0.1" value="{{params.get('ocenaMax', 10)}}"><br><br>
+            <input type="range" name="ocenaMax" min="0" max="10" step="0.1" value="{{parametri.get('ocenaMax', 10)}}"><br><br>
 
-            <input type="submit" value="Apply Filters">
+            <input type="submit" value="Filtriraj">
         </fieldset>
     </form>
 
