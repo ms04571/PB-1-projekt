@@ -122,25 +122,57 @@ def glavnaStranPost():
 
 @vmesnik.route('/<serijaId>')
 def prikaziSerijo(serijaId):
+    sezona = request.query.get('sezona', default='1')
+    try:
+        sezona = int(sezona)
+    except ValueError:
+        sezona = 1
+
     conn = sqlite3.connect(BAZA)
     cur = conn.cursor()
 
     # razred Serija za boljše preglednost
     serija = Serija.novaSerija(cur, serijaId)
 
-    # epizode
+    # število vseh sezon
+    stSezon = cur.execute("""
+        SELECT MAX(sezona) FROM naslovi n1
+        JOIN epizode ON epizode.serija = n1.id
+        JOIN naslovi n2 ON epizode.id = n2.id
+        WHERE n1.id = ?
+    """, (serijaId,)).fetchone()[0] or 1
+
+    epizode = epizodeOdSezone(serijaId, sezona)
+
+    conn.close()
+    return template('serija', serija=serija,
+                              epizode=epizode,
+                              sezona=sezona,
+                              stSezon=stSezon)
+
+
+def epizodeOdSezone(serijaId, stSezone):
+    """
+        vrne seznam epizod serije za podanim id-jem, ki 
+        spadajo pod sezono stSezone
+    """
+    conn = sqlite3.connect(BAZA)
+    cur = conn.cursor()
+
     cur.execute("""
         SELECT n2.id, n2.naslov, ocene.ocena, epizoda, sezona FROM naslovi n1
         JOIN epizode ON epizode.serija = n1.id
         JOIN naslovi n2 ON epizode.id = n2.id
         JOIN ocene ON ocene.id = n2.id
         WHERE n1.id = ?
+        AND sezona = ?
         ORDER BY sezona, epizoda;
-    """, (serijaId,))
-    epizode = cur.fetchall()
+    """, (serijaId, stSezone))
 
+    rez = cur.fetchall()
     conn.close()
-    return template('serija', serija=serija, epizode=epizode)
+    return rez
+
 
 
 if __name__ == "__main__":

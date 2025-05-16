@@ -34,7 +34,7 @@
             <tr><td>Število volitev:</td><td>{{serija.stVolitev}}</td></tr>
             <tr><td>Žanri:</td><td>
                 % for zanr in serija.zanri:
-                    {{zanr + "    "}}
+                    {{zanr + "  "}}
                 % end
                 
             </td></tr>
@@ -58,6 +58,20 @@
     % else:
         <p>Ni podatkov o epizodah.</p>
     % end
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+        <form action="/{{serija.id}}" method="get" style="margin: 0;">
+            <input type="hidden" name="sezona" value="{{sezona - 1}}">
+            <button type="submit" {{'disabled' if sezona <= 1 else ''}}>⟵ Prejšnja sezona</button>
+        </form>
+
+        <span>Sezona {{sezona}} / {{stSezon}}</span>
+
+        <form action="/{{serija.id}}" method="get" style="margin: 0;">
+            <input type="hidden" name="sezona" value="{{sezona + 1}}">
+            <button type="submit" {{'disabled' if sezona >= stSezon else ''}}>Naslednja sezona ⟶</button>
+        </form>
+    </div>
 
 </body>
 </html>
