@@ -45,20 +45,26 @@ class Serija:
 class Epizoda:
 
     def __init__(self, dbInfo):
-        self.id = dbInfo[0]
-        self.naslov = dbInfo[1]
-        self.leto = dbInfo[2]
-        self.ocena = dbInfo[3]
-        self.stVolitev = dbInfo[4]
-        self.zanri = dbInfo[5]
+        self.serijaId = dbInfo[0]
+        self.serijaNaslov = dbInfo[1]
+        self.id = dbInfo[2]
+        self.naslov = dbInfo[3]
+        self.leto = dbInfo[4]
+        self.ocena = dbInfo[5]
+        self.stVolitev = dbInfo[6]
+        self.sezona = dbInfo[7]
+        self.epizoda = dbInfo[8]
+        self.zanri = dbInfo[9]
         self.povezava = f"https://www.imdb.com/title/{self.id}/"
 
     def novaEpizoda(cur, id):
         # glavni podatki
         cur.execute("""
-            SELECT naslovi.id, naslov, zacetekLeto, ocena, stVolitev FROM naslovi 
-            JOIN ocene ON naslovi.id = ocene.id 
-            WHERE naslovi.id = ?
+            SELECT n2.id, n2.naslov, n1.id, n1.naslov, n1.zacetekLeto, ocena, stVolitev, epizode.sezona, epizode.epizoda FROM naslovi n1
+            JOIN epizode ON epizode.id = n1.id
+            JOIN naslovi n2 ON n2.id = epizode.serija
+            JOIN ocene ON n1.id = ocene.id 
+            WHERE n1.id = ?
         """, (id,))
         epizoda = list(cur.fetchone())
 

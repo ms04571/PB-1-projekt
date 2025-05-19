@@ -1,4 +1,4 @@
-from bottle import Bottle, run, template, request
+from bottle import Bottle, run, template, request, static_file
 from razredi import Serija, Epizoda
 import os
 import sqlite3
@@ -14,6 +14,10 @@ ZANRI = ['Musical', 'Documentary', 'News', 'Talk-Show',
          'Animation', 'Thriller', 'Biography', 'Short']
 naStran = 20
 
+
+@vmesnik.route('/style/<filename:path>')
+def static_files(filename):
+    return static_file(filename, root='style')
 
 def ukazIsci(naslov='', izbraniZanri=[], letoMin=1951, letoMax=2025, ocenaMin=0, ocenaMax=10,
              sortirajPo="zacetekLeto", sortiranje = "DESC", stran=1):
@@ -67,10 +71,9 @@ def ukazIsci(naslov='', izbraniZanri=[], letoMin=1951, letoMax=2025, ocenaMin=0,
 
     cur.execute(ukaz, parametri)
     vrstice = cur.fetchall()
-    stolpci = [opis[0] for opis in cur.description]  # imena stolpcev
-    
+
     conn.close()
-    return vrstice, stolpci
+    return vrstice
 
 
 @vmesnik.get('/')
@@ -78,11 +81,10 @@ def glavnaStran_get():
     """
         Prikaže stran z privzetimi filtri
     """
-    vrstice, stolpci = ukazIsci()  
+    vrstice = ukazIsci()  
 
     return template('main', 
-                    parametri={},
-                    stolpci=stolpci, 
+                    parametri={}, 
                     vrstice=vrstice,
                     zanri=ZANRI,
                     izbraniZanri=[],
@@ -108,11 +110,10 @@ def glavnaStranPost():
     if len(izbraniZanri) > 3: 
         izbraniZanri = izbraniZanri[:3]  
 
-    vrstice, stolpci = ukazIsci(naslov, izbraniZanri, letoMin, letoMax, ocenaMin, ocenaMax, sortirajPo, sortiranje, stran)
+    vrstice = ukazIsci(naslov, izbraniZanri, letoMin, letoMax, ocenaMin, ocenaMax, sortirajPo, sortiranje, stran)
     
     return template('main', 
                     parametri=request.forms, 
-                    stolpci=stolpci, 
                     vrstice=vrstice,
                     zanri = ZANRI,
                     izbraniZanri = izbraniZanri,
@@ -122,6 +123,9 @@ def glavnaStranPost():
 
 @vmesnik.route('/<serijaId>')
 def prikaziSerijo(serijaId):
+    """
+        Stran, ki bolj podrobno prikže serijo in njene epizode
+    """
     sezona = request.query.get('sezona', default='1')
     try:
         sezona = int(sezona)
@@ -172,6 +176,22 @@ def epizodeOdSezone(serijaId, stSezone):
     rez = cur.fetchall()
     conn.close()
     return rez
+
+
+@vmesnik.route('/<serijaId>/<epizodaId>')
+def prikaziEpizodo(serijaId, epizodaId):
+    """
+        Stran, ki bolj podrobno prikaže epizodo
+    """
+    conn = sqlite3.connect(BAZA)
+    cur = conn.cursor()
+
+    epizoda = Epizoda.novaEpizoda(cur, epizodaId)
+
+    conn.close()
+
+    return template('epizoda', epizoda=epizoda)
+
 
 
 
