@@ -2,9 +2,18 @@ import sqlite3 as dbapi
 import csv
 import os
 
-# Ta proces lahko traja 10-30 min 
 
+# Če se hoče ustvariti bazo je potrebno v ta imenik vstaviti še 3 dodatne datoteke.
+# To je potrebno zato, ker so datoteke prevelike, da bi jih shranil na github.
+# Na strani https://datasets.imdbws.com/ je potrebno prenesti naslednje datoteke:
+# - title.basics.tsv.gz
+# - title.episode.tsv.gz
+# - title.ratings.tsv.gz
+# Po tem jih je treba ekstrahirati in vstaviti datoteke title.basics.tsv, title.episode.tsv, title.ratings.tsv
+# v imenik v katerem se nahaja ta program.
+# Šele potem lahko ta program zaženeš
 
+# Še več navodil na vrstici 336
 
 path = os.path.dirname(os.path.realpath(__file__))
 BAZA = path + "\\" + 'serije.db'
@@ -324,8 +333,9 @@ def brisiOdvecneStvari(minVolitev):
 
 
 
-# če usvarjaš na novo odkomentiraj vse
-# lahko tudi ročno izbrišeš celo bazo
+# Če usvarjaš na novo, odkomentiraj vso kodo spodaj.
+# Lahko tudi ročno izbrišeš celo bazo.
+# Ta proces lahko traja 10-30 min.
 
 
 #brisi("epizode")
