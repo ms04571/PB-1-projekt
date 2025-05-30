@@ -73,7 +73,7 @@ def menu(moznosti):
             print(str(i + 1) + ")" + moznosti[i])
         print()
 
-        vhod = input()
+        vhod = input("Vpiši število: ")
         
         if (len(vhod) > 0) and (vhod.isdigit()) and (int(vhod) in range(1, len(moznosti) + 1)):
             return int(vhod)
@@ -97,7 +97,7 @@ def izpisiRezultat(rez):
                 print(e, end = "   ")
             print()
         print()
-        vhod = input()
+        vhod = input("Vpiši število: ")
         
         if (len(vhod) > 0) and (vhod.isdigit()) and (int(vhod) in range(1, dolzina + 1)):
             izberi(rez[int(vhod) - 1][0])
@@ -180,7 +180,7 @@ def stSezonInEpizod(id):
             WHERE serija = ?;
         """, [id])
     epizode = conn.execute(
-        """32
+        """
             SELECT COUNT(epizoda) FROM epizode
             WHERE serija = ?;
         """, [id])

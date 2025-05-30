@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="/style/main.css">
 </head>
 <body>
-
+    <a href="/" class="gumb-domov">🏠 Domov</a>
     <h1>{{serija.naslov}}</h1>
 
     <div class="glavniOvoj">

@@ -156,3 +156,21 @@ a:hover {
 .epizoda-info a:hover {
     text-decoration: underline;
 }
+
+.gumb-domov {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background-color: #25758d;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+.gumb-domov:hover {
+    background-color: #0a1620;
+}
