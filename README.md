@@ -23,7 +23,6 @@ Na strani https://datasets.imdbws.com/ je potrebno prenesti naslednje datoteke:
 - title.basics.tsv.gz
 - title.episode.tsv.gz
 - title.ratings.tsv.gz
-
 Po tem jih je treba ekstrahirati in vstaviti datoteke title.basics.tsv, title.episode.tsv, title.ratings.tsv
 v imenik v katerem se nahaja program ustvari.py. Šele potem lahko uspešno zaženeš program ustvari.py.
 
